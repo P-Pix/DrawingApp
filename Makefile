@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++11 `pkg-config --cflags gtkmm-3.0`
 LDFLAGS = `pkg-config --libs gtkmm-3.0`
 INCLUDES = -Iinclude
 
-TARGET = bin/gtkmm_shapes_example
+TARGET = bin/DrawingApp
 
 # Trouver tous les fichiers source dans le répertoire src
 SRCS := $(wildcard src/*.cpp)
