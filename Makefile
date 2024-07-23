@@ -1,19 +1,42 @@
 CXX = g++
-CXXFLAGS = `pkg-config --cflags gtkmm-3.0`
+CXXFLAGS = -std=c++11 `pkg-config --cflags gtkmm-3.0`
 LDFLAGS = `pkg-config --libs gtkmm-3.0`
-TARGET = mygtkmmapp
-SOURCES = main.cpp
-OBJECTS = $(SOURCES:.cpp=.o)
+INCLUDES = -Iinclude
+
+TARGET = bin/gtkmm_shapes_example
+
+# Trouver tous les fichiers source dans le répertoire src
+SRCS := $(wildcard src/*.cpp)
+
+# Remplacer le répertoire src par lib et l'extension .cpp par .o
+OBJS := $(patsubst src/%.cpp, lib/%.o, $(SRCS))
+
+# Remplacer le répertoire src par lib et l'extension .cpp par .dpp
+DEPS := $(patsubst src/%.cpp, lib/%.dpp, $(SRCS))
 
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS)
-	$(CXX) $(OBJECTS) $(LDFLAGS) -o $@
+$(TARGET): $(OBJS)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+lib/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+lib/%.dpp: src/%.cpp
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -MM $< | sed 's|src/\(.*\)\.o|lib/\1.o lib/\1.dpp:|' > $@
+
+# Inclure les fichiers de dépendances s'ils existent
+-include $(DEPS)
+
+init:
+	@mkdir -p bin
+	@mkdir -p lib
+
+run: all
+	./$(TARGET)
 
 clean:
-	rm -f $(TARGET) $(OBJECTS)
+	rm -f $(TARGET) $(OBJS) $(DEPS)
+	rm -rf lib/*.*
 
-.PHONY: all clean
+.PHONY: all clean init run
