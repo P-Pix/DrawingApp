@@ -1,6 +1,14 @@
 # Fenetre de dessin
 Ceci est le README maitre du projet il presente le proejt dans son ensemble sans aller dans les details
 
+Objectfs : 
+- Avoir une fenetre de dessin
+- Ajouter des formes via des boutons
+- Dessiner sur la fenetre
+- Sauvegarder le dessin en jpeg
+- Ouvrir un dessin
+- Ajouter des fonctions de traitement sur imagess
+
 ## Table des matières
 - [Fenetre de dessin](#fenetre-de-dessin)
   - [Table des matières](#table-des-matières)
