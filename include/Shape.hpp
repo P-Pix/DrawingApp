@@ -4,39 +4,59 @@
 #include <gdkmm/rgba.h>
 #include <cairomm/context.h>
 #include <vector>
+#include <iostream>
 
 /**
- *  \brief The Shape class
+ *  \brief The Shape class\n
  *  Classe abstraite représentant une forme géométrique
  */
 class Shape {
 public:
     /**
-     * \brief Destructeur virtuel
+     * \brief Destructeur virtuel\n
      * Destructeur virtuel pour permettre la destruction des objets dérivés
      */
     virtual ~Shape() {}
-    virtual void draw(const Cairo::RefPtr<Cairo::Context>& cr) const = 0;
+
+    /**
+     * \brief Méthode de dessin\n
+     * Méthode virtuelle pure permettant de dessiner la forme
+     * \param cr Référence vers le contexte Cairo
+     */
+    virtual void draw(const Cairo::RefPtr<Cairo::Context>& cr) = 0;
+    virtual std::ostream& to_string(std::ostream& os) const = 0;
+    std::string get_Color() const;
+    friend std::ostream& operator<<(std::ostream& os, const Shape& shape) {
+        return shape.to_string(os);
+    }
+
+    protected:
+        Gdk::RGBA color;
 };
 
 class Circle : public Shape {
 public:
     Circle(double x, double y, double radius, const Gdk::RGBA& color);
-    void draw(const Cairo::RefPtr<Cairo::Context>& cr) const override;
+    void draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
+    std::ostream& to_string(std::ostream& os) const override;
 
 private:
     double x, y, radius;
-    Gdk::RGBA color;
 };
 
+/**
+ *  \brief The Polygon class\n
+ *  Classe représentant un polygone\n
+ *  Un polygone est défini par une liste de points\n
+ */
 class Polygon : public Shape {
 public:
     Polygon(const std::vector<std::pair<double, double>>& points, const Gdk::RGBA& color);
-    void draw(const Cairo::RefPtr<Cairo::Context>& cr) const override;
+    void draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
+    std::ostream& to_string(std::ostream& os) const override;
 
 private:
     std::vector<std::pair<double, double>> points;
-    Gdk::RGBA color;
 };
 
 class Rectangle : public Polygon {

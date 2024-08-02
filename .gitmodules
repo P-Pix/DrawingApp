@@ -1,3 +1,0 @@
-[submodule "lib/gtkmm"]
-	path = lib/gtkmm
-	url = https://github.com/GNOME/gtkmm

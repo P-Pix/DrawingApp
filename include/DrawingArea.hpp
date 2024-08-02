@@ -1,18 +1,18 @@
 #ifndef DRAWINGAREA_HPP
 #define DRAWINGAREA_HPP
 
-#include <vector>
-#include <memory>
-#include <cstdlib>
-#include <ctime>
-#include <cmath>
-#include "Shape.hpp"
 #include <gtkmm/drawingarea.h>
+#include <fstream>
+#include "Shape.hpp"
 
 class DrawingArea : public Gtk::DrawingArea {
 public:
     DrawingArea();
     virtual ~DrawingArea();
+
+    void clear();
+    void read_file(const std::string& filename);
+    void save_file(const std::string& filename);
 
     void add_circle();
     void add_polygon();

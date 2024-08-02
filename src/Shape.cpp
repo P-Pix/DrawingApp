@@ -1,18 +1,26 @@
 #include "Shape.hpp"
 
 Circle::Circle(double x, double y, double radius, const Gdk::RGBA& color)
-    : x(x), y(y), radius(radius), color(color) {}
+    : x(x), y(y), radius(radius) {
+        this->color = color;
+    }
 
-void Circle::draw(const Cairo::RefPtr<Cairo::Context>& cr) const {
+void Circle::draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     cr->set_source_rgba(color.get_red(), color.get_green(), color.get_blue(), color.get_alpha());
     cr->arc(x, y, radius, 0, 2 * M_PI);
     cr->fill();
 }
 
-Polygon::Polygon(const std::vector<std::pair<double, double>>& points, const Gdk::RGBA& color)
-    : points(points), color(color) {}
+std::ostream& Circle::to_string(std::ostream& os) const {
+    return os << "Circle(" << this->x << ", " << this->y << ", " << this->radius << ", " << this->get_Color() << ")";
+}
 
-void Polygon::draw(const Cairo::RefPtr<Cairo::Context>& cr) const {
+Polygon::Polygon(const std::vector<std::pair<double, double>>& points, const Gdk::RGBA& color)
+    : points(points) {
+        this->color = color;
+    }
+
+void Polygon::draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     if (points.empty()) return;
     
     cr->set_source_rgba(color.get_red(), color.get_green(), color.get_blue(), color.get_alpha());
@@ -22,6 +30,23 @@ void Polygon::draw(const Cairo::RefPtr<Cairo::Context>& cr) const {
     }
     cr->close_path();
     cr->fill();
+}
+
+std::ostream& Polygon::to_string(std::ostream& os) const {
+    os << "Polygon(";
+    for (const auto& point : points) {
+        os << "(" << point.first << ", " << point.second << "), ";
+    }
+    os << this->get_Color() << ")";
+    return os;
+}
+
+std::string Shape::get_Color() const {
+    std::string s = "(";
+    s += std::to_string((int)(this->color.get_red()* 255)) + ", ";
+    s += std::to_string((int)(this->color.get_green() * 255)) + ", ";
+    s += std::to_string((int)(this->color.get_blue() * 255)) + ")";
+    return s;
 }
 
 Rectangle::Rectangle(double x, double y, double width, double height, const Gdk::RGBA& color)
