@@ -5,14 +5,14 @@ Circle::Circle(double x, double y, double radius, const Gdk::RGBA& color)
         this->color = color;
     }
 
-void Circle::draw(const Cairo::RefPtr<Cairo::Context>& cr) {
+void Circle::draw(const Cairo::RefPtr<Cairo::Context>& cr) const {
     cr->set_source_rgba(color.get_red(), color.get_green(), color.get_blue(), color.get_alpha());
     cr->arc(x, y, radius, 0, 2 * M_PI);
     cr->fill();
 }
 
 std::ostream& Circle::to_string(std::ostream& os) const {
-    return os << "Circle(" << this->x << ", " << this->y << ", " << this->radius << ", " << this->get_Color() << ")";
+    return os << "Circle{" << this->x << ", " << this->y << ", " << this->radius << ", " << this->get_Color() << "}";
 }
 
 Polygon::Polygon(const std::vector<std::pair<double, double>>& points, const Gdk::RGBA& color)
@@ -20,7 +20,7 @@ Polygon::Polygon(const std::vector<std::pair<double, double>>& points, const Gdk
         this->color = color;
     }
 
-void Polygon::draw(const Cairo::RefPtr<Cairo::Context>& cr) {
+void Polygon::draw(const Cairo::RefPtr<Cairo::Context>& cr) const {
     if (points.empty()) return;
     
     cr->set_source_rgba(color.get_red(), color.get_green(), color.get_blue(), color.get_alpha());
@@ -33,19 +33,19 @@ void Polygon::draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 }
 
 std::ostream& Polygon::to_string(std::ostream& os) const {
-    os << "Polygon(";
+    os << "Polygon{";
     for (const auto& point : points) {
         os << "(" << point.first << ", " << point.second << "), ";
     }
-    os << this->get_Color() << ")";
+    os << this->get_Color() << "}";
     return os;
 }
 
 std::string Shape::get_Color() const {
-    std::string s = "(";
+    std::string s = "[";
     s += std::to_string((int)(this->color.get_red()* 255)) + ", ";
     s += std::to_string((int)(this->color.get_green() * 255)) + ", ";
-    s += std::to_string((int)(this->color.get_blue() * 255)) + ")";
+    s += std::to_string((int)(this->color.get_blue() * 255)) + "]";
     return s;
 }
 

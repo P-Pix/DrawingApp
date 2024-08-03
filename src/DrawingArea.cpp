@@ -2,7 +2,7 @@
 
 DrawingArea::DrawingArea() : size_x(800), size_y(600) {
     set_size_request(this->size_x, this->size_y);
-    srand(static_cast<unsigned>(time(0))); // Seed pour les valeurs aléatoires
+    srand(static_cast<unsigned>(time(nullptr))); // Seed pour les valeurs aléatoires
 }
 
 DrawingArea::~DrawingArea() {
@@ -122,51 +122,50 @@ void DrawingArea::read_file(const std::string& filename) {
     Polygon((319.5, 442.25), (348, 428), (348, 456.5), (319.5, 485), (291, 456.5), (189, 197, 5))
     
     */
-    /*
     std::ifstream file(filename, std::ios::in);
     if (!file.is_open()) {
         std::cout << "Impossible d'ouvrir le fichier " << filename << std::endl;
         return;
     }
+    std::cout << "Lecture du fichier " << filename << std::endl;
     std::string line;
     while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        std::string type;
-        iss >> type;
-        switch (type) {
-            case "Circle": {
-                // Circle(692, 422, 19, (78, 176, 4))
-                int x, y, radius;
-                Gdk::RGBA color;
-                iss >> x >> y >> radius >> color;
-                shapes.push_back(std::make_shared<Circle>(x, y, radius, color));
-                break;
+        size_t pos = line.find('{');
+        if (pos == std::string::npos) {
+            continue;
+        }
+        std::string type = line.substr(0, pos);
+        if (type == "Circle") {
+            // Circle{692, 422, 19, [78, 176, 4]}
+            int x, y, radius, r, g, b;
+            Gdk::RGBA color;
+            sscanf(line.c_str(), "Circle{%d, %d, %d, [%d, %d, %d]}", &x, &y, &radius, &r, &g, &b);
+            color.set_rgba(r / 255.0, g / 255.0, b / 255.0);
+            shapes.push_back(std::make_shared<Circle>(x, y, radius, color));
+        } else if (type == "Polygon") {
+            // Polygon{(319.5, 442.25), (348, 428), (348, 456.5), (319.5, 485), (291, 456.5), [189, 197, 5]}
+            std::vector<std::pair<double, double>> points;
+            int x, y, r, g, b;
+            Gdk::RGBA color;
+            size_t start = pos + 1;
+            size_t end = line.find('}', start);
+            std::string points_str = line.substr(start, end - start);
+            size_t pos = points_str.find('(');
+            while (pos != std::string::npos) {
+                size_t end = points_str.find(')', pos);
+                std::string point_str = points_str.substr(pos + 1, end - pos - 1);
+                sscanf(point_str.c_str(), "%d, %d", &x, &y);
+                points.emplace_back(x, y);
+                pos = points_str.find('(', end);
             }
-            case "Polygon": {
-                os << "Polygon(";
-                for (const auto& point : points) {
-                    os << "(" << point.first << ", " << point.second << "), ";
-                }
-                os << color << ")";
-                std::vector<std::pair<double, double>> points;
-                Gdk::RGBA color;
-                char c;
-                iss >> c;
-                while (c != ')') {
-                    double x, y;
-                    iss >> c >> x >> c >> y >> c;
-                    points.emplace_back(x, y);
-                }
-                iss >> color;
-                shapes.push_back(std::make_shared<Polygon>(points, color));
-                break;
-            }
-            default:
-                std::cout << "Forme inconnue : " << type << std::endl;
+            sscanf(line.c_str(), "Polygon{%*[^[][%d, %d, %d]}", &r, &g, &b);
+            color.set_rgba(r / 255.0, g / 255.0, b / 255.0);
+            shapes.push_back(std::make_shared<Polygon>(points, color));
+        } else {
+            std::cout << "Type inconnue : " << line << std::endl;
         }
     }
     file.close();
-    */
     queue_draw();
 }
 
