@@ -11,9 +11,9 @@ public:
     MainWindow();
 
 private:
-    void onFormeClicked(void (DrawingArea::*f)());
-    void createFileMenuItems();
-    void createFormeMenuItems();
+    void on_Forme_Clicked(void (DrawingArea::*f)());
+    void create_File_Menu_Items();
+    void create_Forme_Menu_Items();
 
     std::string m_FileName = "";
 
@@ -22,7 +22,7 @@ private:
     Gtk::MenuBar m_MenuBar;
 
     Gtk::MenuItem m_MenuFormes;
-    Gtk::Menu m_MenuFomresItems;
+    Gtk::Menu m_Menu_Formes_Items;
     Gtk::MenuItem m_Add_Polygon;
     Gtk::MenuItem m_Add_Rectangle;
     Gtk::MenuItem m_Add_Circle;
@@ -30,7 +30,9 @@ private:
     Gtk::MenuItem m_Add_Triangle;
     Gtk::MenuItem m_Add_Star;
     Gtk::MenuItem m_Add_Heart;
-    Gtk::Entry m_Entry;
+    Gtk::SeparatorMenuItem m_Separator;
+    Gtk::MenuItem m_Add_Manual_Circle;
+    Gtk::MenuItem m_Add_Manual_Polygon;
 
     Gtk::MenuItem m_MenuFile;
     Gtk::Menu m_MenuFileItems;

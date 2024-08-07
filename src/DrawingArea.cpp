@@ -3,10 +3,92 @@
 DrawingArea::DrawingArea() : size_x(800), size_y(600) {
     set_size_request(this->size_x, this->size_y);
     srand(static_cast<unsigned>(time(nullptr))); // Seed pour les valeurs aléatoires
+    add_events(Gdk::BUTTON_PRESS_MASK);
+    signal_button_press_event().connect(sigc::mem_fun(*this, &DrawingArea::on_button_press_event));
+    add_events(Gdk::KEY_PRESS_MASK);
+    signal_key_press_event().connect(sigc::mem_fun(*this, &DrawingArea::on_key_press_event));  
+    set_can_focus(true);  
 }
 
 DrawingArea::~DrawingArea() {
     // destructeur virtuel
+}
+
+bool DrawingArea::on_button_press_event(GdkEventButton* event) {
+    // Check if the event is a left mouse button click
+    if (event->button == 1) {
+        // Retrieve the x and y coordinates of the click
+        double x = event->x;
+        double y = event->y;
+
+        // Print the coordinates to the console (or handle them as needed)
+        std::cout << "Clicked at (" << x << ", " << y << ")" << std::endl;
+
+        if (this->create_Shape_mode) {
+            this->coordinates_create_Shape_mode.push_back(std::pair<double, double>(x, y));
+        }
+
+        // Return true to indicate that the event has been handled
+        return true;
+    }
+
+    // Return false if the event has not been handled
+    return false;
+}
+
+bool DrawingArea::on_key_press_event(GdkEventKey* event) {
+    // Check if the event is a key press
+    if (event->type == GDK_KEY_PRESS) {
+        // Retrieve the keyval of the key that was pressed
+        guint keyval = event->keyval;
+
+        // Print the keyval to the console (or handle it as needed)
+        std::cout << "Key pressed: " << keyval << std::endl;
+
+        if (keyval == GDK_KEY_Return) { // Touche entrée
+            if (this->create_Shape_mode) {
+                if (this->type_Shape == ShapeType::CIRCLE) {
+                    if (this->coordinates_create_Shape_mode.size() >= 2) {
+                        double x1 = this->coordinates_create_Shape_mode[0].first;
+                        double y1 = this->coordinates_create_Shape_mode[0].second;
+                        double x2 = this->coordinates_create_Shape_mode[1].first;
+                        double y2 = this->coordinates_create_Shape_mode[1].second;
+                        double radius = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+                        Gdk::RGBA color;
+                        color.set_rgba(rand() / double(RAND_MAX), rand() / double(RAND_MAX), rand() / double(RAND_MAX));
+                        shapes.push_back(std::make_shared<Circle>(x1, y1, radius, color));
+                        queue_draw();
+                    }
+                } else if (this->type_Shape == ShapeType::POLYGON) {
+                    Gdk::RGBA color;
+                    color.set_rgba(rand() / double(RAND_MAX), rand() / double(RAND_MAX), rand() / double(RAND_MAX));
+                    shapes.push_back(std::make_shared<Polygon>(this->coordinates_create_Shape_mode, color));
+                    queue_draw();
+                }
+                this->create_Shape_mode = false;
+            }
+        }
+
+        // Return true to indicate that the event has been handled
+        return true;
+    }
+
+    // Return false if the event has not been handled
+    return false;
+}
+
+void DrawingArea::add_Manual(int type_Shape) {
+    this->create_Shape_mode = true;
+    this->coordinates_create_Shape_mode.clear();
+    this->type_Shape = type_Shape;
+}
+
+void DrawingArea::add_Manual_Circle() {
+    this->add_Manual(ShapeType::CIRCLE);
+}
+
+void DrawingArea::add_Manual_Polygon() {
+    this->add_Manual(ShapeType::POLYGON);
 }
 
 void DrawingArea::add_circle() {
@@ -113,15 +195,6 @@ void DrawingArea::clear() {
 
 void DrawingArea::read_file(const std::string& filename) {
     this->clear();
-    /*
-
-    Polygon((364, 530), (404, 530), (404, 572), (364, 572), (140, 192, 94))
-    Polygon((226, 551), (280, 551), (280, 571), (226, 571), (120, 111, 163))
-    Circle(692, 422, 19, (78, 176, 4))
-    Polygon((318, 588), (330, 604), (342, 604), (334, 620), (342, 636), (318, 628), (294, 636), (302, 620), (294, 604), (306, 604), (243, 111, 3))
-    Polygon((319.5, 442.25), (348, 428), (348, 456.5), (319.5, 485), (291, 456.5), (189, 197, 5))
-    
-    */
     std::ifstream file(filename, std::ios::in);
     if (!file.is_open()) {
         std::cout << "Impossible d'ouvrir le fichier " << filename << std::endl;
@@ -167,6 +240,16 @@ void DrawingArea::read_file(const std::string& filename) {
     }
     file.close();
     queue_draw();
+}
+
+void DrawingArea::open_picture(const std::string& filename) {
+    this->clear();
+    std::ifstream file(filename, std::ios::in);
+    if (!file.is_open()) {
+        std::cout << "Impossible d'ouvrir le fichier " << filename << std::endl;
+        return;
+    }
+    std::cout << "Lecture du fichier " << filename << std::endl;
 }
 
 void DrawingArea::save_file(const std::string& filename) {
