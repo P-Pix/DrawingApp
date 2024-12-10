@@ -25,7 +25,7 @@ lib/%.o: src/%.cpp
 lib/%.dpp: src/%.cpp
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -MM $< | sed 's|src/\(.*\)\.o|lib/\1.o lib/\1.dpp:|' > $@
 
-compile: $(OBJS)
+compile: $(TARGET)
 
 recompile: clean compile
 

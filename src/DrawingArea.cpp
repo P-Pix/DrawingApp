@@ -49,10 +49,11 @@ bool DrawingArea::on_key_press_event(GdkEventKey* event) {
             if (this->create_Shape_mode) {
                 if (this->type_Shape == ShapeType::CIRCLE) {
                     if (this->coordinates_create_Shape_mode.size() >= 2) {
-                        double x1 = this->coordinates_create_Shape_mode[0].first;
-                        double y1 = this->coordinates_create_Shape_mode[0].second;
-                        double x2 = this->coordinates_create_Shape_mode[1].first;
-                        double y2 = this->coordinates_create_Shape_mode[1].second;
+                        int s = coordinates_create_Shape_mode.size();
+                        double x1 = this->coordinates_create_Shape_mode[s - 2].first;
+                        double y1 = this->coordinates_create_Shape_mode[s - 2].second;
+                        double x2 = this->coordinates_create_Shape_mode[s - 1].first;
+                        double y2 = this->coordinates_create_Shape_mode[s - 1].second;
                         double radius = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
                         Gdk::RGBA color;
                         color.set_rgba(rand() / double(RAND_MAX), rand() / double(RAND_MAX), rand() / double(RAND_MAX));
